@@ -5,6 +5,8 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" packagePrefix="App\" />
       <sourceFolder url="file://$MODULE_DIR$/system" isTestSource="false" packagePrefix="System\" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/composer" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/doctrine/lexer" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/egulias/email-validator" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/ghalambaz/config-file-manager" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/ingenerator/tokenista" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/izniburak/pdox" />
