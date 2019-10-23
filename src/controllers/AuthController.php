@@ -71,7 +71,7 @@ class AuthController extends Controller
             $newUser = new UsersModel();
             $newUser->create($user);
 
-            $this->response->setContent(json_encode(['success']));
+            $this->response->setContent('success');
             $this->response->setStatusCode(201);
             $this->response->send();
         }
