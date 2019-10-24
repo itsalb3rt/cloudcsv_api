@@ -39,6 +39,13 @@ class UsersModel extends Model
             ->get();
     }
 
+    public function getByToken($token){
+        return $this->db()
+            ->table('users')
+            ->where('token','=',$token)
+            ->get();
+    }
+
     public function getByUserName($userName){
         return $this->db()
             ->table('users')
