@@ -70,6 +70,15 @@ class TablesController extends Controller
                 $this->response->setStatusCode(201);
                 $this->response->send();
                 break;
+            case 'DELETE':
+                $config = new ConfigFileManager(__ROOT__DIR__ . 'system/config/config.php.ini');
+                $table = $tables->getById($id);
+                $tables->delete($id);
+                $tables->drop($config->prefix . $table->table_name);
+                $this->response->setContent('success');
+                $this->response->setStatusCode(200);
+                $this->response->send();
+                break;
         }
     }
 
