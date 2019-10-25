@@ -7,6 +7,7 @@ use App\plugins\Util;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use App\models\emailsNotifications\EmailsNotificationsModel;
+use App\models\tables\TablesModel;
 
 class NotificationsemailsController extends Controller
 {
@@ -29,15 +30,18 @@ class NotificationsemailsController extends Controller
             case 'GET':
                 if ($id === null) {
                     $qString = new QueryStringPurifier();
-                    $this->response->setContent(json_encode($notifications->getAll($qString->getFields(),
+                    $notifications = $notifications->getAll($qString->getFields(),
                         $qString->fieldsToFilter(),
                         $qString->getOrderBy(),
                         $qString->getSorting(),
                         $qString->getOffset(),
-                        $qString->getLimit())));
+                        $qString->getLimit());
+                    $notifications = $this->getTable($notifications);
+                    $this->response->setContent(json_encode($notifications));
                 } else {
                     $notifications = $notifications->getById($id);
-                    $this->response->setContent(json_encode($notifications));
+                    $notifications = $this->getTable([$notifications]); //Hack for use same method for search group notification table a simple notification
+                    $this->response->setContent(json_encode($notifications[0]));
                 }
 
                 $this->response->setStatusCode(200);
@@ -64,5 +68,13 @@ class NotificationsemailsController extends Controller
                 $this->response->send();
                 break;
         }
+    }
+
+    private function getTable($notifications){
+        $tables = new TablesModel();
+        foreach ($notifications as $notification){
+            $notification->{'table'} = $tables->getById($notification->id_table_storage);
+        }
+        return $notifications;
     }
 }
