@@ -14,10 +14,10 @@ class DataStorageModel extends Model
             ->insert($data);
     }
 
-    public function getAll($fields,$filter,$oderBy,$orderDir,$offset,$limit){
+    public function getAll($table,$fields,$filter,$oderBy,$orderDir,$offset,$limit){
         return $this->db()
             ->select($fields)
-            ->table('notifications_emails')
+            ->table($table)
             ->where($filter)
             ->orderBy($oderBy,$orderDir)
             ->offset($offset)
