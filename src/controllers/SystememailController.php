@@ -33,6 +33,7 @@ class SystememailController extends Controller
 
                 $this->validateEmail($newEmail['email']);
                 $config->system_email = $newEmail['email'];
+                $config->system_email_password = $newEmail['password'];
 
                 $config->save();
                 $this->sendRespose('success', 201);
