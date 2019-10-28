@@ -1,5 +1,6 @@
 <?php
 
+use App\plugins\QueryStringPurifier;
 use App\plugins\SecureApi;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,12 +21,27 @@ class DatastorageController extends Controller
         $this->response->headers->set('content-type', 'application/json');
     }
 
-    public function dataStorage($id = null)
+    public function dataStorage($idTable = null, $idRecord = null)
     {
         $dataStorage = new DataStorageModel();
+        $tables = new TablesModel();
 
         switch ($this->request->server->get('REQUEST_METHOD')) {
             case 'GET':
+                $qString = new QueryStringPurifier();
+                $table = $tables->getById($idTable);
+                $this->isValidTable($table);
+
+                $data = $dataStorage->getAll($table->table_name, $qString->getFields(),
+                    $qString->fieldsToFilter(),
+                    $qString->getOrderBy(),
+                    $qString->getSorting(),
+                    $qString->getOffset(),
+                    $qString->getLimit());
+
+                $this->response->setContent(json_encode($data));
+                $this->response->setStatusCode(200);
+                $this->response->send();
                 break;
             case 'POST':
                 $data = json_decode(file_get_contents('php://input'), true);
@@ -39,7 +55,7 @@ class DatastorageController extends Controller
                 foreach ($data['data'] as $value) {
                     $value['id_user'] = $user->id_user;
                     $value['create_at'] = $createAt;
-                    $dataStorage->create($table->table_name,$value);
+                    $dataStorage->create($table->table_name, $value);
                 }
 
                 $this->response->setContent('success');
@@ -50,6 +66,16 @@ class DatastorageController extends Controller
                 break;
             case 'DELETE':
                 break;
+        }
+    }
+
+    private function isValidTable($table)
+    {
+        if (empty($table)) {
+            $this->response->setContent('table not found');
+            $this->response->setStatusCode(404);
+            $this->response->send();
+            die();
         }
     }
 }
