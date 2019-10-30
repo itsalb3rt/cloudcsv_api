@@ -130,6 +130,19 @@ class TablesModel extends Model
             ->exec();
     }
 
+    public function deleteColumnFromTablesColumns($id){
+        $this->db()
+            ->table('tables_columns')
+            ->where('id_table_colum', '=', $id)
+            ->delete();
+    }
+
+    public function deleteColumnFromTable($table,$column){
+        $this->db()
+            ->query("ALTER TABLE $this->dbPrefix$table DROP COLUMN $column")
+            ->exec();
+    }
+
     public function delete($id): void
     {
         $this->db()
