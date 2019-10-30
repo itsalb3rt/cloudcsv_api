@@ -96,11 +96,10 @@ class TablesController extends Controller
                 $currentColumnData = $tables->getColumnById($id);
                 $tableData = $tables->getById($column['id_table']);
 
-
-                $this->oldColumnNameAndNewIsSame($currentColumnData->column_name, $column['column_name']);
-
-                $tables->changeColumnName($tableData->table_name, $currentColumnData->column_name, $column['column_name']);
-                $tables->updateColumnNameOnTablecolumns($id, ['column_name' => $column['column_name']]);
+               if( !$this->oldColumnNameAndNewIsSame($currentColumnData->column_name, $column['column_name'])){
+                   $tables->changeColumnName($tableData->table_name, $currentColumnData->column_name, $column['column_name']);
+                   $tables->updateColumnNameOnTablecolumns($id, ['column_name' => $column['column_name']]);
+               }
 
                 if ($column['type'] !== $currentColumnData->type) {
                     if ($currentColumnData->type === 'number') {
@@ -119,10 +118,9 @@ class TablesController extends Controller
     private function oldColumnNameAndNewIsSame($old, $new)
     {
         if ($old === $new) {
-            $this->response->setContent('The new name and old name is same');
-            $this->response->setStatusCode(409);
-            $this->response->send();
-            die();
+            return true;
+        }else{
+            return false;
         }
     }
 
