@@ -98,6 +98,12 @@ class TablesModel extends Model
             ->get();
     }
 
+    public function createColumnOnTable($table,$column,$type){
+        $this->db()
+            ->query("ALTER TABLE $this->dbPrefix$table ADD COLUMN $column $type")
+            ->exec();
+    }
+
     public function changeColumnName($tableName,$currentColumnName,$newColumnName){
         $this->db()
             ->query("ALTER TABLE $this->dbPrefix$tableName RENAME COLUMN $currentColumnName TO $newColumnName")
