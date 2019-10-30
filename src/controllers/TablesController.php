@@ -112,6 +112,23 @@ class TablesController extends Controller
                 $this->response->setStatusCode(201);
                 $this->response->send();
                 break;
+            case 'POST':
+                $newColumn = json_decode(file_get_contents('php://input'), true);
+
+                if(!empty($tables->getColumnByName($newColumn['id_table'],$newColumn['name']))){
+                    $this->response->setContent('The column exits on table');
+                    $this->response->setStatusCode(409);
+                    $this->response->send();
+                    die();
+                }
+                $table = $tables->getById($newColumn['id_table']);
+                $tables->createColumnOnTable($table->table_name,$newColumn['name'],$newColumn['dataType']);
+                $this->saveColumns([$newColumn],$table->id_table_storage);
+
+                $this->response->setContent('success');
+                $this->response->setStatusCode(201);
+                $this->response->send();
+                break;
         }
     }
 
