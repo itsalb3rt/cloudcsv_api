@@ -129,6 +129,16 @@ class TablesController extends Controller
                 $this->response->setStatusCode(201);
                 $this->response->send();
                 break;
+            case 'DELETE':
+                $column = $tables->getColumnById($id);
+                $table = $tables->getById($column->id_table_storage);
+
+                $tables->deleteColumnFromTablesColumns($id);
+                $tables->deleteColumnFromTable($table->table_name,$column->column_name);
+                $this->response->setContent('success');
+                $this->response->setStatusCode(200);
+                $this->response->send();
+                break;
         }
     }
 
