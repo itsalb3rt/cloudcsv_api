@@ -122,7 +122,7 @@ class TablesController extends Controller
                     die();
                 }
                 $table = $tables->getById($newColumn['id_table']);
-                $tables->createColumnOnTable($table->table_name,$newColumn['name'],$newColumn['dataType']);
+                $tables->createColumnOnTable($table->table_name,$newColumn['name'],$this->getDataTypeForTable($newColumn['dataType']));
                 $this->saveColumns([$newColumn],$table->id_table_storage);
 
                 $this->response->setContent('success');
