@@ -96,7 +96,6 @@ class TablesController extends Controller
                 $currentColumnData = $tables->getColumnById($id);
                 $tableData = $tables->getById($column['id_table']);
 
-
                if( !$this->oldColumnNameAndNewIsSame($currentColumnData->column_name, $column['column_name'])){
                    $tables->changeColumnName($tableData->table_name, $currentColumnData->column_name, $column['column_name']);
                    $tables->updateColumnNameOnTablecolumns($id, ['column_name' => $column['column_name']]);
