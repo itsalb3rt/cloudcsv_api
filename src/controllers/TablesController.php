@@ -40,7 +40,7 @@ class TablesController extends Controller
                     $this->response->setContent(json_encode($table));
                 } else {
                     $table = $tables->getById($id);
-                    $table = $this->getTablesColumns( [$table] ); //Hack for using same function for group tables and simple table
+                    $table = $this->getTablesColumns([$table]); //Hack for using same function for group tables and simple table
                     $this->response->setContent(json_encode($table[0]));
                 }
 
@@ -79,6 +79,50 @@ class TablesController extends Controller
                 $this->response->setStatusCode(200);
                 $this->response->send();
                 break;
+        }
+    }
+
+    public function columns($id = null): void
+    {
+        $tables = new TablesModel();
+        switch ($this->request->server->get('REQUEST_METHOD')) {
+            case 'GET':
+                $this->response->setContent('Method Not Allowed');
+                $this->response->setStatusCode(405);
+                $this->response->send();
+                break;
+            case 'PATCH':
+                $column = json_decode(file_get_contents('php://input'), true);
+                $currentColumnData = $tables->getColumnById($id);
+                $tableData = $tables->getById($column['id_table']);
+
+
+                $this->oldColumnNameAndNewIsSame($currentColumnData->column_name, $column['column_name']);
+
+                $tables->changeColumnName($tableData->table_name, $currentColumnData->column_name, $column['column_name']);
+                $tables->updateColumnNameOnTablecolumns($id, ['column_name' => $column['column_name']]);
+
+                if ($column['type'] !== $currentColumnData->type) {
+                    if ($currentColumnData->type === 'number') {
+                        $tables->changeDataType($tableData->table_name, $column['column_name'], $this->getDataTypeForTable($column['type']));
+                    }
+                }
+                $tables->updateColumnLength($id,['length'=>$column['length']]);
+
+                $this->response->setContent('success');
+                $this->response->setStatusCode(201);
+                $this->response->send();
+                break;
+        }
+    }
+
+    private function oldColumnNameAndNewIsSame($old, $new)
+    {
+        if ($old === $new) {
+            $this->response->setContent('The new name and old name is same');
+            $this->response->setStatusCode(409);
+            $this->response->send();
+            die();
         }
     }
 
