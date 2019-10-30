@@ -91,6 +91,19 @@ class TablesModel extends Model
             ->get();
     }
 
+    public function getColumnByName($idTable,$columnName){
+        return $this->db()
+            ->table('tables_columns')
+            ->where(['id_table_storage' => $idTable, 'column_name'=>$columnName])
+            ->get();
+    }
+
+    public function createColumnOnTable($table,$column,$type){
+        $this->db()
+            ->query("ALTER TABLE $this->dbPrefix$table ADD COLUMN $column $type")
+            ->exec();
+    }
+
     public function changeColumnName($tableName,$currentColumnName,$newColumnName){
         $this->db()
             ->query("ALTER TABLE $this->dbPrefix$tableName RENAME COLUMN $currentColumnName TO $newColumnName")
@@ -114,6 +127,19 @@ class TablesModel extends Model
     public function changeDataType($table,$column,$type){
         $this->db()
             ->query("ALTER TABLE $this->dbPrefix$table ALTER COLUMN $column TYPE $type USING $column::$type")
+            ->exec();
+    }
+
+    public function deleteColumnFromTablesColumns($id){
+        $this->db()
+            ->table('tables_columns')
+            ->where('id_table_colum', '=', $id)
+            ->delete();
+    }
+
+    public function deleteColumnFromTable($table,$column){
+        $this->db()
+            ->query("ALTER TABLE $this->dbPrefix$table DROP COLUMN $column")
             ->exec();
     }
 
