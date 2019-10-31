@@ -71,8 +71,17 @@ class UsersController extends Controller
                 break;
             case 'PATCH':
                 $user = json_decode(file_get_contents('php://input'), true);
+
                 if (!empty($user) && $id !== null) {
                     $users = new UsersModel();
+                    $requestUser = $users->getByToken(str_replace('Bearer ', '', $this->request->headers->get('authorization')));
+
+                    if(!$this->isAuthorizeToModificate($user,$requestUser)){
+                        $this->response->setContent('Unauthorized');
+                        $this->response->setStatusCode(401);
+                        $this->response->send();
+                        die();
+                    }
 
                     if(isset($user['email']))
                         $this->validateEmail($user['email']);
@@ -82,6 +91,9 @@ class UsersController extends Controller
                         $this->isPasswordSecure($user['password']);
                         $user['password'] = $this->passwordHasing($user['password']);
                     }
+
+                    if(isset($user['confirm_password']))
+                        unset($user['confirm_password']);
 
                     $users->update($id, $user);
                     $this->response->setContent('success');
@@ -147,6 +159,18 @@ class UsersController extends Controller
             $this->response->setStatusCode(409);
             $this->response->send();
             die();
+        }
+    }
+
+    private function isAuthorizeToModificate($userToPatch,$requestUser){
+        if($userToPatch['id_user'] === $requestUser->id_user){
+            return true;
+        }else{
+            if($requestUser->role === 'admin'){
+                return true;
+            }else{
+                return false;
+            }
         }
     }
 }
