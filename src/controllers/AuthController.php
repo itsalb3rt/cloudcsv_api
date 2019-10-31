@@ -85,7 +85,7 @@ class AuthController extends Controller
     private function passwordMatch(string $password1, string $password2): void
     {
         if ($password1 != $password2){
-            $this->response->setContent(json_encode(['the password not match']));
+            $this->response->setContent(json_encode('the password not match'));
             $this->response->setStatusCode(409);
             $this->response->send();
             die();
@@ -95,7 +95,7 @@ class AuthController extends Controller
     private function isPasswordSecure(string $password): void
     {
         if (strlen($password) < 8) {
-            $this->response->setContent(json_encode(['the password is not secure']));
+            $this->response->setContent(json_encode('the password is not secure'));
             $this->response->setStatusCode(409);
             $this->response->send();
             die();
@@ -119,7 +119,7 @@ class AuthController extends Controller
     {
         $validator = new EmailValidator();
         if($validator->isValid($email, new RFCValidation()) === false){
-            $this->response->setContent(json_encode(['the email is not valid']));
+            $this->response->setContent(json_encode('the email is not valid'));
             $this->response->setStatusCode(409);
             $this->response->send();
             die();
