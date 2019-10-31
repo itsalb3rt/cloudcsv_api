@@ -1,5 +1,7 @@
 <?php
 
+use App\models\AccountRecovery\AccountRecovery;
+use App\plugins\AccountRecoveryEmailSender\AccountRecoveryEmailSender;
 use App\plugins\SecureApi;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,12 +31,12 @@ class AuthController extends Controller
             $user = $user->getByUserName($requestUser['user_name']);
             $this->isUserNotFound($user);
 
-            if(password_verify($requestUser['password'],$user->password)){
+            if (password_verify($requestUser['password'], $user->password)) {
                 unset($user->password);
                 $this->response->setContent(json_encode($user));
                 $this->response->setStatusCode(201);
                 $this->response->send();
-            }else{
+            } else {
                 $this->response->setContent(json_encode(['Unauthorized']));
                 $this->response->setStatusCode(401);
                 $this->response->send();
@@ -42,8 +44,9 @@ class AuthController extends Controller
         }
     }
 
-    public function isUserNotFound($user){
-        if(empty($user)){
+    public function isUserNotFound($user)
+    {
+        if (empty($user)) {
             $this->response->setContent(json_encode(["User Not Found"]));
             $this->response->setStatusCode(404);
             $this->response->send();
@@ -51,7 +54,7 @@ class AuthController extends Controller
         }
     }
 
-    public function register():void
+    public function register(): void
     {
         if ($this->request->server->get('REQUEST_METHOD') === 'POST') {
 
@@ -77,6 +80,73 @@ class AuthController extends Controller
         }
     }
 
+    public function recovery()
+    {
+
+        if ($this->request->server->get('REQUEST_METHOD') === 'POST') {
+            $data = json_decode(file_get_contents('php://input'), true);
+            $email = $data['email'];
+            $users = new UsersModel();
+            $currentUser = $users->getByEmail($email);
+
+            if (!empty($currentUser)) {
+                $token = 'cloudcsv';
+                $tokenista = new Tokenista($token, ["lifetime" => 7200]);
+                $token = $tokenista->generate();
+
+                $accountRecovery = new AccountRecovery();
+                $accountRecovery->removeAccountRecoveryInformation($currentUser->id_user);
+
+                $accountRecovery->setAccountRecoveryInformation([
+                    'id_user' => $currentUser->id_user,
+                    "token" => $token
+                ]);
+
+                $emailSend = new AccountRecoveryEmailSender($email, $token);
+                $emailSend->send();
+
+                $this->response->setContent('success');
+                $this->response->setStatusCode(200);
+
+            } else {
+                $this->response->setContent(json_encode('The email no exits'));
+                $this->response->setStatusCode(409);
+            }
+            $this->response->send();
+        }
+    }
+
+    public function resetPassword()
+    {
+
+        if ($this->request->server->get('REQUEST_METHOD') === 'POST') {
+            $data = json_decode(file_get_contents('php://input'), true);
+            $token = $data['token'];
+
+            $tokenista = new Tokenista('cloudcsv', ["lifetime" => 7200]);
+            $accountRecovery = new AccountRecovery();
+            $accountData = $accountRecovery->getByToken($token);
+
+            if ($tokenista->isValid($token) === true && $tokenista->isExpired($token) === false && !empty($accountData)) {
+                $password = $data['password'];
+                $confirmPassword = $data['confirm_password'];
+                $user = new UsersModel();
+                $this->passwordMatch($password, $confirmPassword);
+
+                $user->update($accountData->id_user, [
+                    'password' => $this->passwordHasing($password)
+                ]);
+                $accountRecovery->removeAccountRecoveryInformation($accountData->id_user);
+                $this->response->setContent('success');
+                $this->response->setStatusCode(200);
+            } else {
+                $this->response->setContent('the token is not valid');
+                $this->response->setStatusCode(401);
+            }
+            $this->response->send();
+        }
+    }
+
     private function passwordHasing(string $password): string
     {
         return password_hash($password, PASSWORD_ARGON2I);
@@ -84,7 +154,7 @@ class AuthController extends Controller
 
     private function passwordMatch(string $password1, string $password2): void
     {
-        if ($password1 != $password2){
+        if ($password1 != $password2) {
             $this->response->setContent(json_encode('the password not match'));
             $this->response->setStatusCode(409);
             $this->response->send();
@@ -102,7 +172,7 @@ class AuthController extends Controller
         }
     }
 
-    private function defineUserRole($user):string
+    private function defineUserRole($user): string
     {
         if (isset($user['role'])) {
             if ($user['role'] === 'admin' || $user['role'] === 'user') {
@@ -115,10 +185,10 @@ class AuthController extends Controller
         }
     }
 
-    private function validateEmail($email):void
+    private function validateEmail($email): void
     {
         $validator = new EmailValidator();
-        if($validator->isValid($email, new RFCValidation()) === false){
+        if ($validator->isValid($email, new RFCValidation()) === false) {
             $this->response->setContent(json_encode('the email is not valid'));
             $this->response->setStatusCode(409);
             $this->response->send();

@@ -53,6 +53,13 @@ class UsersModel extends Model
             ->get();
     }
 
+    public function getByEmail($email){
+        return $this->db()
+            ->table('users')
+            ->where('email','=',$email)
+            ->get();
+    }
+
     public function delete($id){
         $this->db()
             ->table('users')

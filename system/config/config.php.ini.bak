@@ -7,5 +7,6 @@ charset=utf8
 collation=utf8_general_ci
 prefix=cloudcsv.
 port=
-system_email=alhidalgo@domain.com
-system_email_password=Albert17
+system_email=security@gibucket.a2hosted.com
+system_email_password="!qLIT=qlc4c_"
+system_email_host=mail.gibucket.a2hosted.com

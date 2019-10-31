@@ -32,8 +32,9 @@ class SystememailController extends Controller
                 $newEmail = json_decode(file_get_contents('php://input'), true);
 
                 $this->validateEmail($newEmail['email']);
+                $config->system_email_host = $newEmail['host'];
                 $config->system_email = $newEmail['email'];
-                $config->system_email_password = $newEmail['password'];
+                $config->system_email_password = '"' . $newEmail['password'] . '"';
 
                 $config->save();
                 $this->sendRespose('success', 201);
