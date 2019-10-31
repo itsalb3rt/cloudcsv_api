@@ -9,7 +9,7 @@ require_once __ROOT__DIR__.'vendor/autoload.php';
 /**
  * WebRoot Es el archivo que enlaza todos los mecanismos globales del Framework
  **/
-
+define('BASE_URL_PRODUCTION_FRONTEND','https://gibucket.a2hosted.com/cloudcsv_app');
 /**
  * Verifica la version del servidor, las versiones debajo de la 7.1.3 no soportan
  * ciertas caracteristicas como la palabra recervada const en propiedades de clases.
