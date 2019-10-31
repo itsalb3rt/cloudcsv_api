@@ -32,7 +32,7 @@ class AccountRecovery extends Model
     public function getByToken($token){
         return $this->db()
             ->table('recovered_accounts')
-            ->where('single_use_token','=',$token)
+            ->where('token','=',$token)
             ->get();
     }
 }
