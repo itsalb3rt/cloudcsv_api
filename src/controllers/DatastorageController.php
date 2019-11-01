@@ -1,5 +1,7 @@
 <?php
 
+use App\models\emailsNotifications\EmailsNotificationsModel;
+use App\plugins\EmailSender\EmailSender;
 use App\plugins\QueryStringPurifier;
 use App\plugins\SecureApi;
 use Symfony\Component\HttpFoundation\Response;
@@ -57,6 +59,22 @@ class DatastorageController extends Controller
                     $value['create_at'] = $createAt;
                     $dataStorage->create($table->table_name, $value);
                 }
+
+                $emailsNotification = new EmailsNotificationsModel();
+                $emailsNotification = $emailsNotification->getAll('*',
+                    ['id_table_storage' => $data['table_id'], 'action' => 'create'],
+                    1, 'DESC',
+                    NULL,
+                    NULL);
+
+                $emailSender = new EmailSender();
+                $emailSender->setSubject('CloudCsv: New entry on ' . $table->table_name);
+                $emailSender->setBody('New entry on' . $table->table_name . ' by ' . $user->full_name );
+
+                foreach ($emailsNotification as $email){
+                    $emailSender->setAddress($email->email);
+                }
+                $emailSender->send();
 
                 $this->response->setContent('success');
                 $this->response->setStatusCode(201);
