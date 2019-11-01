@@ -69,7 +69,7 @@ class DatastorageController extends Controller
 
                 $emailSender = new EmailSender();
                 $emailSender->setSubject('CloudCsv: New entry on ' . $table->table_name);
-                $emailSender->setBody('New entry on' . $table->table_name . ' by ' . $user->full_name );
+                $emailSender->setBody('New entry on ' . $table->table_name . ' by ' . $user->full_name );
 
                 foreach ($emailsNotification as $email){
                     $emailSender->setAddress($email->email);
