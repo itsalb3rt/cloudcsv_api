@@ -9,46 +9,57 @@
 
 namespace App\plugins;
 
+use App\models\users\UsersModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class SecureApi
 {
-    /**
-     * Controller constructor.
-     *
-     * Valida la seguridad del API
-     */
-    public function __construct()
-    {
-        if (ENVIROMENT == 'dev') {
-            $origin = "http://localhost:8080";
-        } else {
-            $origin = "https://gibucket.a2hosted.com";
-        }
+    private $publicArea;
+    private $request;
+    private $response;
+    private $acceptOrigin = (ENVIROMENT == 'dev') ? "http://localhost:8080" : "https://gibucket.a2hosted.com";
 
-        if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    public function __construct(bool $publicArea = false)
+    {
+        $this->publicArea = $publicArea;
+        $this->request = Request::createFromGlobals();
+        $this->response = new Response();
+
+        $this->cors();
+
+        if ($this->publicArea === false) {
+            $this->isTokenValid();
+        }
+    }
+
+    private function cors(): void
+    {
+        if ($this->request->server->get('REQUEST_METHOD') == 'OPTIONS') {
             header("Access-Control-Allow-Credentials", "true");
             header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Authorization");
-            header("Access-Control-Allow-Origin:$origin");
+            header("Access-Control-Allow-Origin:$this->acceptOrigin");
             header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
             die();
         }
 
-
         header("Access-Control-Allow-Credentials", "true");
         header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Authorization");
-        header("Access-Control-Allow-Origin:$origin");
+        header("Access-Control-Allow-Origin:$this->acceptOrigin");
         header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
     }
 
-    private function isTokenValid()
+    private function isTokenValid(): void
     {
-        $request = Request::createFromGlobals();
-        if (strlen($request->server->filter('HTTP_X_AUTH_APP_KEY')) < 5) {
-            return true;
-        } else {
-            return false;
+        $userToken = str_replace('Bearer ', '', $this->request->headers->get('authorization'));
+        $user = new UsersModel();
+        $user = $user->getByToken($userToken);
+
+        if (empty($user)) {
+            $this->response->setContent('Forbidden');
+            $this->response->setStatusCode(403);
+            $this->response->send();
+            die();
         }
     }
 }
