@@ -1,7 +1,6 @@
 <?php
 
 use App\models\AccountRecovery\AccountRecovery;
-use App\plugins\AccountRecoveryEmailSender\AccountRecoveryEmailSender;
 use App\plugins\SecureApi;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
@@ -9,6 +8,7 @@ use Egulias\EmailValidator\EmailValidator;
 use Egulias\EmailValidator\Validation\RFCValidation;
 use App\models\users\UsersModel;
 use Ingenerator\Tokenista;
+use App\plugins\EmailSender\EmailSender;
 
 class AuthController extends Controller
 {
@@ -102,8 +102,11 @@ class AuthController extends Controller
                     "token" => $token
                 ]);
 
-                $emailSend = new AccountRecoveryEmailSender($email, $token);
-                $emailSend->send();
+                $emailSender = new EmailSender();
+                $emailSender->setSubject('CloudCsv account recovery');
+                $emailSender->setBody($this->getBodyMessageForRecoveryEmail($token));
+                $emailSender->setAddress($email);
+                $emailSender->send();
 
                 $this->response->setContent('success');
                 $this->response->setStatusCode(200);
@@ -194,6 +197,14 @@ class AuthController extends Controller
             $this->response->send();
             die();
         }
+    }
+
+    private function getBodyMessageForRecoveryEmail($token){
+        $bodyMessage = '<div>The following link will take you to an external page to recover your password;</div>';
+        $url = BASE_URL_PRODUCTION_FRONTEND."/auth/reset-password/?token=$token";
+        $bodyMessage .= '<div><a href=" '. $url .' "> ' . $url . '</a></div>';
+        $bodyMessage .= '<div>This email expires in 2 hours.</div>';
+        return $bodyMessage;
     }
 
 }
