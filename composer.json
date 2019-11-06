@@ -1,6 +1,6 @@
 {
-  "name": "ligne/ligne",
-  "description": "Ligne PHP Framework",
+  "name": "itsalb3rt/cloudcsv-api",
+  "description": "API for cloudcsv project",
   "type": "project",
   "license": "MIT",
   "authors": [
