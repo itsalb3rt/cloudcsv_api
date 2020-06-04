@@ -17,7 +17,7 @@ class AuthController extends Controller
 
     public function __construct()
     {
-        new SecureApi();
+        new SecureApi(true);
         $this->request = Request::createFromGlobals();
         $this->response = new Response();
         $this->response->headers->set('content-type', 'application/json');
