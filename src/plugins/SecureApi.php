@@ -18,7 +18,7 @@ class SecureApi
     private $publicArea;
     private $request;
     private $response;
-    private $acceptOrigin = (ENVIROMENT == 'dev') ? "http://localhost:8080" : "https://gibucket.a2hosted.com";
+    private $acceptOrigin = "*";
 
     public function __construct(bool $publicArea = false)
     {
