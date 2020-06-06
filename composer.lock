@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "35bfad42cf2858bbfecf253150f93651",
+    "content-hash": "27c6baf355efcc8a08e9814867847242",
     "packages": [
         {
             "name": "doctrine/lexer",
@@ -275,6 +275,48 @@
                 "sql"
             ],
             "time": "2020-04-30T14:12:26+00:00"
+        },
+        {
+            "name": "ligne/error-handler",
+            "version": "1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/lignedev/error-handler.git",
+                "reference": "703354a1bb72687028fee04526b73a172c193618"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/lignedev/error-handler/zipball/703354a1bb72687028fee04526b73a172c193618",
+                "reference": "703354a1bb72687028fee04526b73a172c193618",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Ligne\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Albert Eduardo Hidalgo Taveras",
+                    "email": "itsalb3rt@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Error Handler for Ligne PHP",
+            "homepage": "https://github.com/lignedev/error-handler",
+            "keywords": [
+                "error handler",
+                "ligne php"
+            ],
+            "time": "2020-06-06T15:04:16+00:00"
         },
         {
             "name": "phpmailer/phpmailer",
