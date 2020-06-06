@@ -10,12 +10,14 @@ services:
     volumes:
       - ./etc/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
     ports:
-      - ${POSTGRES_EXPOSED_PORT}:3306
+      - ${POSTGRES_EXPOSED_PORT}:5432
+
   adminer:
     image: adminer
     restart: always
     ports:
-      - 8019:8080
+      - ${ADMINER_EXPOSED_PORT}:8080
+
   cloudcsv-api:
     image: php:7.2-apache
     build: .
