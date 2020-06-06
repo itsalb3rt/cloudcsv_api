@@ -1,5 +1,5 @@
 FROM php:7.2-apache
-COPY . /var/www/html/cloudcsv
+COPY . /var/www/html/cloudcsv_api
 
 RUN apt-get update && \
     apt-get upgrade -y && \
@@ -16,5 +16,5 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 RUN a2enmod rewrite
 
-WORKDIR /var/www/html/cloudcsv
+WORKDIR /var/www/html/cloudcsv_api
 RUN composer install
