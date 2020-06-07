@@ -4,6 +4,7 @@ COPY . /var/www/html/cloudcsv_api
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y git \
+    -y libpq-dev \
     zip \
     unzip
 
