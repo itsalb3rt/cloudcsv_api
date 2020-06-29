@@ -26,7 +26,7 @@ services:
     ports:
       - ${API_EXPOSED_PORT}:80
     labels: 
-      - "traefik.http.routers.cloudcsv-api.rule=Host(`DOMAIN`) && path(`/cloudcsv_api`)"
+      - "traefik.http.routers.cloudcsv-api.rule=Host(`${DOMAIN}`) && path(`/cloudcsv_api`)"
       - "traefik.http.middlewares.cloudcsv-api-stripprefix.stripprefix.prefixes=/cloudcsv_api"
       - "traefik.http.routers.cloudcsv-api.middlewares=cloudcsv-api-stripprefix"
       - "traefik.http.routers.cloudcsv-api.entrypoints=websecure"
