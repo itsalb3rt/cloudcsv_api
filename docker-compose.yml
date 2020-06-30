@@ -11,6 +11,8 @@ services:
       - ./etc/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
     ports:
       - ${POSTGRES_EXPOSED_PORT}:5432
+    networks:
+      - traefik-network
 
   adminer:
     image: adminer
