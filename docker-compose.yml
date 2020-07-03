@@ -9,6 +9,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - ./etc/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+      - ./postgresdata:/var/lib/postgresql
     ports:
       - ${POSTGRES_EXPOSED_PORT}:5432
     networks:
@@ -36,6 +37,3 @@ networks:
   traefik-network:
     external:
       name: traefik_proxynet
-
-volumes:
-  mysqldata:
