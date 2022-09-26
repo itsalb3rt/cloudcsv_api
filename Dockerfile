@@ -13,7 +13,9 @@ RUN docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql
 RUN docker-php-ext-install pdo pdo_pgsql
 
 #Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN curl https://getcomposer.org/download/1.10.26/composer.phar --output composer.phar
+RUN chmod a+x composer.phar
+RUN mv composer.phar /usr/local/bin/composer
 
 RUN a2enmod rewrite
 
