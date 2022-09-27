@@ -1,12 +1,10 @@
 FROM php:7.2-apache
-COPY . /var/www/html/cloudcsv_api
+WORKDIR /var/www/html/cloudcsv_api
 
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y git \
-    -y libpq-dev \
-    zip \
-    unzip
+    -y libpq-dev
 
 # PDO driver
 RUN docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql
@@ -22,4 +20,3 @@ RUN a2enmod rewrite
 EXPOSE 80
 
 WORKDIR /var/www/html/cloudcsv_api
-RUN composer install
