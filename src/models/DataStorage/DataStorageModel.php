@@ -25,6 +25,14 @@ class DataStorageModel extends Model
             ->getAll();
     }
 
+    public function count($table,$filter){
+        return $this->db()
+            ->table($table)
+            ->where($filter)
+            ->count('*', 'total')
+            ->get();
+    }
+
     public function getById($table,$id){
         return $this->db()
             ->table($table)
