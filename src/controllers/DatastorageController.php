@@ -34,14 +34,32 @@ class DatastorageController extends Controller
                 $table = $tables->getById($idTable);
                 $this->isValidTable($table);
 
-                $data = $dataStorage->getAll($table->table_name, $qString->getFields(),
+                // Calculating item offset for pagination
+                $offset = ($qString->getOffset('page') - 1) * $qString->getLimit('limit');
+                $count = $dataStorage->count($table->table_name, $qString->fieldsToFilter());
+                $limit = $qString->getLimit('limit') > 0 ? $qString->getLimit('limit') : $count->total;
+
+                $data = $dataStorage->getAll(
+                    $table->table_name,
+                    $qString->getFields(),
                     $qString->fieldsToFilter(),
                     $qString->getOrderBy(),
                     $qString->getSorting(),
-                    $qString->getOffset(),
-                    $qString->getLimit());
+                    $offset,
+                    $limit
+                );
 
-                $this->response->setContent(json_encode($data));
+                $count = $dataStorage->count($table->table_name, $qString->fieldsToFilter());
+
+                $response = [
+                    'data' => $data,
+                    'pagination' => [
+                        'total' => $count->total,
+                        'offset' => $qString->getOffset(),
+                        'limit' => $qString->getLimit()
+                    ]
+                ];
+                $this->response->setContent(json_encode($response));
                 $this->response->setStatusCode(200);
                 $this->response->send();
                 break;
@@ -61,17 +79,20 @@ class DatastorageController extends Controller
                 }
 
                 $emailsNotification = new EmailsNotificationsModel();
-                $emailsNotification = $emailsNotification->getAll('*',
+                $emailsNotification = $emailsNotification->getAll(
+                    '*',
                     ['id_table_storage' => $data['table_id'], 'action' => 'create'],
-                    1, 'DESC',
+                    1,
+                    'DESC',
                     NULL,
-                    NULL);
+                    NULL
+                );
 
                 $emailSender = new EmailSender();
                 $emailSender->setSubject('CloudCsv: New entry on ' . $table->table_name);
-                $emailSender->setBody('New entry on ' . $table->table_name . ' by ' . $user->full_name );
+                $emailSender->setBody('New entry on ' . $table->table_name . ' by ' . $user->full_name);
 
-                foreach ($emailsNotification as $email){
+                foreach ($emailsNotification as $email) {
                     $emailSender->setAddress($email->email);
                 }
                 $emailSender->send();
