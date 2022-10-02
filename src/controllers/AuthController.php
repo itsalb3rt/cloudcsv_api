@@ -71,12 +71,22 @@ class AuthController extends Controller
             $token = new Tokenista('cloudcsv');
             $user['token'] = $token->generate();
 
-            $newUser = new UsersModel();
-            $newUser->create($user);
+            $checkUser = new UsersModel();
+            $userByEmail = $checkUser->getByEmail($user['email']);
+            $userByUserName = $checkUser->getByUserName($user['user_name']);
 
-            $this->response->setContent('success');
-            $this->response->setStatusCode(201);
-            $this->response->send();
+            if (empty($userByEmail) && empty($userByUserName)) {
+                $newUser = new UsersModel();
+                $newUser->create($user);
+
+                $this->response->setContent('success');
+                $this->response->setStatusCode(201);
+                $this->response->send();
+            } else {
+                $this->response->setContent('error');
+                $this->response->setStatusCode(409);
+                $this->response->send();
+            }
         }
     }
 
