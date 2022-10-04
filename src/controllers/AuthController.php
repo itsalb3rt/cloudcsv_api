@@ -83,7 +83,7 @@ class AuthController extends Controller
                 $this->response->setStatusCode(201);
                 $this->response->send();
             } else {
-                $this->response->setContent('error');
+                $this->response->setContent(json_encode(['message' => 'User Already Exist']));
                 $this->response->setStatusCode(409);
                 $this->response->send();
             }
