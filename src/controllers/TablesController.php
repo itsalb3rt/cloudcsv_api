@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use App\models\users\UsersModel;
 use ConfigFileManager\ConfigFileManager;
+use App\plugins\Util;
 
 
 class TablesController extends Controller
@@ -48,19 +49,22 @@ class TablesController extends Controller
                 $this->response->send();
                 break;
             case 'POST':
-
+                $util = new Util();
                 $newTable = json_decode(file_get_contents('php://input'), true);
                 $this->checkIsDataInCorrectFormat($newTable);
-                $this->checkIsTableExits($newTable['table_name']);
+
+                $tableName = $util->sanitizeString($newTable['table_name']);
+
+                $this->checkIsTableExits($tableName);
 
                 $userToken = str_replace('Bearer ', '', $this->request->headers->get('authorization'));
                 $user = new UsersModel();
-                $query = $this->getTable($newTable['columns'], $newTable['table_name']);
+                $query = $this->getTable($newTable['columns'], $tableName);
                 $user = $user->getByToken($userToken);
 
                 $tables->create($query);
                 $idNewTable = $tables->saveInDataStorage([
-                    "table_name" => $newTable['table_name'],
+                    "table_name" => $util->sanitizeString($tableName),
                     "create_at" => date('Y-m-d H:i:s'),
                     "id_user" => $user->id_user
                 ]);
