@@ -97,7 +97,9 @@ class DatastorageController extends Controller
                 }
                 $emailSender->send();
 
-                $this->response->setContent('success');
+                $this->response->setContent(json_encode([
+                    "message" => "success",
+                ]));
                 $this->response->setStatusCode(201);
                 $this->response->send();
                 break;

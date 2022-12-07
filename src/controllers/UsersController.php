@@ -65,7 +65,9 @@ class UsersController extends Controller
                 $newUser = new UsersModel();
                 $newUser->create($user);
 
-                $this->response->setContent('success');
+                $this->response->setContent(json_encode([
+                    "message" => "success",
+                ]));
                 $this->response->setStatusCode(201);
                 $this->response->send();
                 break;
@@ -96,7 +98,9 @@ class UsersController extends Controller
                         unset($user['confirm_password']);
 
                     $users->update($id, $user);
-                    $this->response->setContent('success');
+                    $this->response->setContent(json_encode([
+                    "message" => "success",
+                ]));
                     $this->response->setStatusCode(201);
                     $this->response->send();
                 }
@@ -105,7 +109,9 @@ class UsersController extends Controller
                 if($id !== null){
                     $users = new UsersModel();
                     $users->delete($id);
-                    $this->response->setContent('success');
+                    $this->response->setContent(json_encode([
+                    "message" => "success",
+                ]));
                     $this->response->setStatusCode(201);
                     $this->response->send();
                 }

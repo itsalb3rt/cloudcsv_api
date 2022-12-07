@@ -72,7 +72,9 @@ class TablesController extends Controller
                 ]);
                 $this->saveColumns($newTable['columns'], $idNewTable);
 
-                $this->response->setContent('success');
+                $this->response->setContent(json_encode([
+                    "message" => "success",
+                ]));
                 $this->response->setStatusCode(201);
                 $this->response->send();
                 break;
@@ -81,7 +83,9 @@ class TablesController extends Controller
                 $table = $tables->getById($id);
                 $tables->delete($id);
                 $tables->drop($config->prefix . $table->table_name);
-                $this->response->setContent('success');
+                $this->response->setContent(json_encode([
+                    "message" => "success",
+                ]));
                 $this->response->setStatusCode(200);
                 $this->response->send();
                 break;
@@ -116,7 +120,9 @@ class TablesController extends Controller
                 }
                 $tables->updateColumnLength($id, ['length' => $column['length']]);
 
-                $this->response->setContent('success');
+                $this->response->setContent(json_encode([
+                    "message" => "success",
+                ]));
                 $this->response->setStatusCode(201);
                 $this->response->send();
                 break;
@@ -137,7 +143,9 @@ class TablesController extends Controller
                 $tables->createColumnOnTable($table->table_name, $columnName, $this->getDataTypeForTable($newColumn['dataType']));
                 $this->saveColumns([$newColumn], $table->id_table_storage);
 
-                $this->response->setContent('success');
+                $this->response->setContent(json_encode([
+                    "message" => "success",
+                ]));
                 $this->response->setStatusCode(201);
                 $this->response->send();
                 break;
@@ -147,7 +155,9 @@ class TablesController extends Controller
 
                 $tables->deleteColumnFromTablesColumns($id);
                 $tables->deleteColumnFromTable($table->table_name, $column->column_name);
-                $this->response->setContent('success');
+                $this->response->setContent(json_encode([
+                    "message" => "success",
+                ]));
                 $this->response->setStatusCode(200);
                 $this->response->send();
                 break;

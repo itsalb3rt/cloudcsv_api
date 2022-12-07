@@ -52,7 +52,9 @@ class NotificationsemailsController extends Controller
                 $util->validateEmail($newNotification['email']);
                 $notifications->create($newNotification);
 
-                $this->response->setContent('success');
+                $this->response->setContent(json_encode([
+                    "message" => "success",
+                ]));
                 $this->response->setStatusCode(201);
                 $this->response->send();
                 break;
@@ -63,7 +65,9 @@ class NotificationsemailsController extends Controller
                 break;
             case 'DELETE':
                 $notifications->delete($id);
-                $this->response->setContent('success');
+                $this->response->setContent(json_encode([
+                    "message" => "success",
+                ]));
                 $this->response->setStatusCode(200);
                 $this->response->send();
                 break;

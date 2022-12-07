@@ -88,7 +88,9 @@ class AuthController extends Controller
                 $newUser = new UsersModel();
                 $newUser->create($user);
 
-                $this->response->setContent('success');
+                $this->response->setContent(json_encode([
+                    "message" => "success",
+                ]));
                 $this->response->setStatusCode(201);
                 $this->response->send();
             } else {
@@ -127,7 +129,9 @@ class AuthController extends Controller
                 $emailSender->setAddress($email);
                 $emailSender->send();
 
-                $this->response->setContent('success');
+                $this->response->setContent(json_encode([
+                    "message" => "success",
+                ]));
                 $this->response->setStatusCode(200);
 
             } else {
@@ -159,7 +163,9 @@ class AuthController extends Controller
                     'password' => $this->passwordHasing($password)
                 ]);
                 $accountRecovery->removeAccountRecoveryInformation($accountData->id_user);
-                $this->response->setContent('success');
+                $this->response->setContent(json_encode([
+                    "message" => "success",
+                ]));
                 $this->response->setStatusCode(200);
             } else {
                 $this->response->setContent('the token is not valid');
