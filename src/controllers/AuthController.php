@@ -28,7 +28,14 @@ class AuthController extends Controller
         if ($this->request->server->get('REQUEST_METHOD') === 'POST') {
             $requestUser = json_decode(file_get_contents('php://input'), true);
             $user = new UsersModel();
-            $user = $user->getByUserName($requestUser['user_name']);
+            $userName = $requestUser['user_name'];
+
+            if (filter_var($userName, FILTER_VALIDATE_EMAIL)) {
+                $user = $user->getByEmail($userName);
+            } else {
+                $user = $user->getByUserName($userName);
+            }
+
             $this->isUserNotFound($user);
 
             if (password_verify($requestUser['password'], $user->password)) {
@@ -73,6 +80,8 @@ class AuthController extends Controller
 
             $checkUser = new UsersModel();
             $userByEmail = $checkUser->getByEmail($user['email']);
+            $user['user_name'] = explode('@', $user['email'])[0];
+
             $userByUserName = $checkUser->getByUserName($user['user_name']);
 
             if (empty($userByEmail) && empty($userByUserName)) {
