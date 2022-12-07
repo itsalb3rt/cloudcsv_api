@@ -39,7 +39,8 @@ class Util
         $string = stripslashes($string);
         $string = htmlspecialchars($string);
         $string = preg_replace('/\s+/', '_', $string);
-        $string = preg_replace('/[^A-Za-z0-9_]/', '', $string);
+        $string = strtolower($string);
+        $string = preg_replace('/[^a-z0-9_]/', '', $string);
         return $string;
     }
 }
