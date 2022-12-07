@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use App\models\users\UsersModel;
 use ConfigFileManager\ConfigFileManager;
+use App\plugins\Util;
 
 
 class TablesController extends Controller
@@ -30,12 +31,14 @@ class TablesController extends Controller
             case 'GET':
                 if ($id === null) {
                     $qString = new QueryStringPurifier();
-                    $table = $tables->getAll($qString->getFields(),
+                    $table = $tables->getAll(
+                        $qString->getFields(),
                         $qString->fieldsToFilter(),
                         $qString->getOrderBy(),
                         $qString->getSorting(),
                         $qString->getOffset(),
-                        $qString->getLimit());
+                        $qString->getLimit()
+                    );
                     $table = $this->getTablesColumns($table);
                     $this->response->setContent(json_encode($table));
                 } else {
@@ -48,19 +51,22 @@ class TablesController extends Controller
                 $this->response->send();
                 break;
             case 'POST':
-
+                $util = new Util();
                 $newTable = json_decode(file_get_contents('php://input'), true);
                 $this->checkIsDataInCorrectFormat($newTable);
-                $this->checkIsTableExits($newTable['table_name']);
+
+                $tableName = $util->sanitizeString($newTable['table_name']);
+
+                $this->checkIsTableExits($tableName);
 
                 $userToken = str_replace('Bearer ', '', $this->request->headers->get('authorization'));
                 $user = new UsersModel();
-                $query = $this->getTable($newTable['columns'], $newTable['table_name']);
+                $query = $this->getTable($newTable['columns'], $tableName);
                 $user = $user->getByToken($userToken);
 
                 $tables->create($query);
                 $idNewTable = $tables->saveInDataStorage([
-                    "table_name" => $newTable['table_name'],
+                    "table_name" => $tableName,
                     "create_at" => date('Y-m-d H:i:s'),
                     "id_user" => $user->id_user
                 ]);
@@ -95,18 +101,20 @@ class TablesController extends Controller
                 $column = json_decode(file_get_contents('php://input'), true);
                 $currentColumnData = $tables->getColumnById($id);
                 $tableData = $tables->getById($column['id_table']);
+                $util = new Util();
+                $columnName = $util->sanitizeString($column['column_name']);
 
-               if( !$this->oldColumnNameAndNewIsSame($currentColumnData->column_name, $column['column_name'])){
-                   $tables->changeColumnName($tableData->table_name, $currentColumnData->column_name, $column['column_name']);
-                   $tables->updateColumnNameOnTablecolumns($id, ['column_name' => $column['column_name']]);
-               }
+                if (!$this->oldColumnNameAndNewIsSame($currentColumnData->column_name, $columnName)) {
+                    $tables->changeColumnName($tableData->table_name, $currentColumnData->column_name, $columnName);
+                    $tables->updateColumnNameOnTablecolumns($id, ['column_name' => $columnName]);
+                }
 
                 if ($column['type'] !== $currentColumnData->type) {
                     if ($currentColumnData->type === 'number') {
                         $tables->changeDataType($tableData->table_name, $column['column_name'], $this->getDataTypeForTable($column['type']));
                     }
                 }
-                $tables->updateColumnLength($id,['length'=>$column['length']]);
+                $tables->updateColumnLength($id, ['length' => $column['length']]);
 
                 $this->response->setContent('success');
                 $this->response->setStatusCode(201);
@@ -115,15 +123,19 @@ class TablesController extends Controller
             case 'POST':
                 $newColumn = json_decode(file_get_contents('php://input'), true);
 
-                if(!empty($tables->getColumnByName($newColumn['id_table'],$newColumn['name']))){
+                if (!empty($tables->getColumnByName($newColumn['id_table'], $newColumn['name']))) {
                     $this->response->setContent('The column exits on table');
                     $this->response->setStatusCode(409);
                     $this->response->send();
                     die();
                 }
+
+                $util = new Util();
+                $columnName = $util->sanitizeString($newColumn['name']);
+
                 $table = $tables->getById($newColumn['id_table']);
-                $tables->createColumnOnTable($table->table_name,$newColumn['name'],$this->getDataTypeForTable($newColumn['dataType']));
-                $this->saveColumns([$newColumn],$table->id_table_storage);
+                $tables->createColumnOnTable($table->table_name, $columnName, $this->getDataTypeForTable($newColumn['dataType']));
+                $this->saveColumns([$newColumn], $table->id_table_storage);
 
                 $this->response->setContent('success');
                 $this->response->setStatusCode(201);
@@ -134,7 +146,7 @@ class TablesController extends Controller
                 $table = $tables->getById($column->id_table_storage);
 
                 $tables->deleteColumnFromTablesColumns($id);
-                $tables->deleteColumnFromTable($table->table_name,$column->column_name);
+                $tables->deleteColumnFromTable($table->table_name, $column->column_name);
                 $this->response->setContent('success');
                 $this->response->setStatusCode(200);
                 $this->response->send();
@@ -146,7 +158,7 @@ class TablesController extends Controller
     {
         if ($old === $new) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
@@ -171,11 +183,13 @@ class TablesController extends Controller
     private function saveColumns(array $columns, int $tableId): void
     {
         $tables = new TablesModel();
+        $util = new Util();
 
         foreach ($columns as $value) {
+            $columnName = $util->sanitizeString($value['name']);
             $tables->saveColumn([
                 "id_table_storage" => $tableId,
-                "column_name" => $value['name'],
+                "column_name" => $columnName,
                 "type" => $value['dataType'],
                 "length" => $value['length']
             ]);
