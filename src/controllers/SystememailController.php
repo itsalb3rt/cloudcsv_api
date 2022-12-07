@@ -37,7 +37,9 @@ class SystememailController extends Controller
                 $config->system_email_password = '"' . $newEmail['password'] . '"';
 
                 $config->save();
-                $this->sendRespose('success', 201);
+                $this->sendRespose(json_encode([
+                    "message" => "success",
+                ]), 201);
                 break;
             case 'PATCH':
             case 'DELETE':
