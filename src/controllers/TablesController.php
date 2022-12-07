@@ -64,7 +64,7 @@ class TablesController extends Controller
 
                 $tables->create($query);
                 $idNewTable = $tables->saveInDataStorage([
-                    "table_name" => $util->sanitizeString($tableName),
+                    "table_name" => $tableName,
                     "create_at" => date('Y-m-d H:i:s'),
                     "id_user" => $user->id_user
                 ]);
