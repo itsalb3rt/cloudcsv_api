@@ -7,7 +7,6 @@ use App\plugins\SecureApi;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use App\models\users\UsersModel;
-use ConfigFileManager\ConfigFileManager;
 use App\plugins\Util;
 
 
@@ -79,10 +78,9 @@ class TablesController extends Controller
                 $this->response->send();
                 break;
             case 'DELETE':
-                $config = new ConfigFileManager(__ROOT__DIR__ . 'system/config/config.php.ini');
                 $table = $tables->getById($id);
                 $tables->delete($id);
-                $tables->drop($config->prefix . $table->table_name);
+                $tables->drop($_ENV["POSTGRES_DATABASE_PREFIX"] . $table->table_name);
                 $this->response->setContent(json_encode([
                     "message" => "success",
                 ]));
@@ -175,8 +173,7 @@ class TablesController extends Controller
 
     private function getTable(array $data, string $tableName): string
     {
-        $systemConfigIni = new ConfigFileManager(__ROOT__DIR__ . 'system/config/config.php.ini');
-        $dbPrefix = $systemConfigIni->prefix;
+        $dbPrefix = $_ENV["POSTGRES_DATABASE_PREFIX"];
         $result = "CREATE TABLE " . $dbPrefix . "$tableName ( id_$tableName SERIAL PRIMARY KEY, create_at TIMESTAMP, id_user INTEGER, ";
         $dataSize = count($data) - 1;
         $loopCount = 0;
