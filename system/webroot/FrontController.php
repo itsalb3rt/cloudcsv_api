@@ -49,6 +49,11 @@ require_once(__ROOT__DIR__ . 'system/Assets.php');
 
 use Ligne\ErrorHandler;
 
+// Load the env file
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . "../../../");
+$dotenv->load();
+
+
 new ErrorHandler(ENVIROMENT);
 
 $dispatch = new Dispatcher();

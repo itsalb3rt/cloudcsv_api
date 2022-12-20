@@ -4,7 +4,6 @@
 namespace App\models\tables;
 
 
-use ConfigFileManager\ConfigFileManager;
 use System\Model;
 
 class TablesModel extends Model
@@ -13,8 +12,7 @@ class TablesModel extends Model
 
     public function __construct()
     {
-        $systemConfigIni = new ConfigFileManager(__ROOT__DIR__ . 'system/config/config.php.ini');
-        $this->dbPrefix = $systemConfigIni->prefix;
+        $this->dbPrefix = $_ENV["POSTGRES_DATABASE_PREFIX"];
     }
 
     public function create(string $table)
