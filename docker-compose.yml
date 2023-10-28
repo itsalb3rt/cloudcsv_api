@@ -9,7 +9,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DATABASE_NAME}
     volumes:
       - ./etc/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
-      - ./postgresdata:/var/lib/postgresql/data
+      # - ./postgresdata:/var/lib/postgresql/data #Enable this if you want to persist data
     networks:
       - traefik-network
 
@@ -29,5 +29,5 @@ services:
 
 networks:
   traefik-network:
-    external:
-      name: traefik_proxynet
+    name: traefik_proxynet
+    external: true
